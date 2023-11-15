@@ -8,7 +8,7 @@ token = tokenfile.read()
 
 bot = telebot.TeleBot(token)
 
-@bot.message_handler['start']
+@bot.message_handler(commands=['start'])
 def start(message):
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     data = dt_string.split(' ')[0]
