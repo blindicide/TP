@@ -19,7 +19,6 @@ def check_if_registered(user_id): # Если пользователя нет, в
     for i in groupsuperlist:
         if i[0] == user_id:
             return i[1]
-            break
         else:
             return False
         
@@ -44,10 +43,12 @@ def get_text_messages(message):
             var_time = "Добрый вечер,"
         username = message.from_user.username
         varres = var_time + " " + username + "." + " Текущие дата и время -" + dt_string + ".\n"
-        
+        start_var1 = check_if_registered()
         bot.send_message(message.from_user.id, varres)
     elif message.text == "abcd":
         bot.send_message(message.from_user.id, "ABCD ABCD")
     elif message.text == "test2":
         bot.send_message(message.from_user.id, schedulesuperlist[0][1])
+    elif message.test == "chkid":
+        bot.send_message(message.from_user.id,message.from_user.id)
 bot.infinity_polling()
