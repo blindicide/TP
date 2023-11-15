@@ -45,7 +45,6 @@ bot = telebot.TeleBot(token)
 def get_text_messages(message):
     global schedulesuperlist
     if message.text == '/start':
-        cv5 
         dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
         data = dt_string.split(' ')[0]
         time = dt_string.split(' ')[1]
