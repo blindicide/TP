@@ -2,6 +2,7 @@ import telebot
 from telebot import types
 from datetime import date
 from datetime import datetime
+import pickle
 today = date.today()
 now = datetime.now()
 
