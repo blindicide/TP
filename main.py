@@ -9,10 +9,6 @@ token = tokenfile.read()
 bot = telebot.TeleBot(token)
 
 @bot.message_handler['start']
-@bot.message_handler['quit']
-@bot.message_handler['register']
-
-
 def start(message):
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     data = dt_string.split(' ')[0]
@@ -25,4 +21,5 @@ def start(message):
         var_time = "Добрый вечер,"
     username = message.from_user.username
     varres = var_time + " " + username + "." + " Текущие дата и время -" + dt_string + ".\nВведите номер вашей группы, пожалуйста."
-    bot.send_message(message.from_user.id, )
+    bot.send_message(message.from_user.id, varres)
+bot.infinity_polling()
