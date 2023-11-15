@@ -21,7 +21,8 @@ def check_if_registered(user_id): # Если пользователя нет, в
         if int(i[0]) == int(user_id):
             return i[1]
         else:
-            return False
+            pass
+    return False
 
 
 def print_schedule(group): # Печатает расписание для группы, если она существует
