@@ -53,7 +53,7 @@ def get_text_messages(message):
             var_time = "Добрый вечер,"
         username = message.from_user.username
         varres = var_time + " " + username + "." + " Текущие дата и время -" + dt_string + ".\n"
-        start_var1 = check_if_registered()
+        start_var1 = check_if_registered(message.from_user.id)
         if start_var1 is False:
             varres += "Вы не зарегистрированы в боте. Введите номер вашей группы."
         else:
