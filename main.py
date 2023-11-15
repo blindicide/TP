@@ -18,7 +18,7 @@ with open("groups.txt", "rb") as file:
 def check_if_registered(user_id): # Если пользователя нет, возвращает False, если есть - возвращает группу
     global groupsuperlist
     for i in groupsuperlist:
-        if i[0] == user_id:
+        if int(i[0]) == int(user_id):
             return i[1]
         else:
             return False
