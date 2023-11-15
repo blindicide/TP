@@ -2,6 +2,7 @@ import telebot
 from telebot import types
 from datetime import date
 today = date.today()
+now = datetime.now()
 
 tokenfile = open("token.txt", "r")
 token = tokenfile.read()
