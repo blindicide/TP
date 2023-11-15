@@ -1,6 +1,6 @@
 import pickle
 groupsuperlist = []
-gsl1 = ["TEST_USER", "TEST_GROUP"]
+gsl1 = [11111, "TEST_GROUP"]
 groupsuperlist.append(gsl1)
 with open("users.txt", "wb") as file:
     pickle.dump(groupsuperlist, file)
