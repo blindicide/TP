@@ -33,6 +33,7 @@ def print_schedule(group): # Печатает расписание для гру
             break
         else:
             pass
+    return False
 
 
 bot = telebot.TeleBot(token)
@@ -58,8 +59,15 @@ def get_text_messages(message):
         if start_var1 is False:
             varres += "Вы не зарегистрированы в боте. Введите номер вашей группы."
         else:
-            print(print_schedule(start_var1)[1])
-        bot.send_message(message.from_user.id, varres)
+            if print_schedule(start_var1) is not False:
+                varres += "Ваша группа - "
+                varres += str(print_schedule(start_var1)[0])
+                varres += ". Вывожу расписание."
+                bot.send_message(message.from_user.id, varres)
+                (print_schedule(start_var1)[1])
+            else:
+                bot.send_message(message.from_user.id,"Ошибка. Код А-1: несуществующая группа. Пожалуйста, повторите ввод. Для вашего удобства выводим список всех групп по курсам.")
+        
     elif message.text == "abcd":
         bot.send_message(message.from_user.id, "ABCD ABCD")
     elif message.text == "test2":
