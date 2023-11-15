@@ -15,9 +15,9 @@ def start(message):
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     data = dt_string.split(' ')[0]
     time = dt_string.split(' ')[1]
-    if time.split(':')[0] < 11:
+    if int(time.split(':')[0]) < 11:
         var_time = "Доброе утро,"
-    elif time.split(':')[1] >= 11 and time.split(':')[1] < 18:
+    elif int(time.split(':')[1]) >= 11 and int(time.split(':')[1])< 18:
         var_time = "Добрый день,"
     else:
         var_time = "Добрый вечер,"
