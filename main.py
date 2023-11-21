@@ -20,9 +20,11 @@ with open("users.txt", "rb") as file:
     groupsuperlist = pickle.load(file)
 with open("groups.txt", "rb") as file:
     schedulesuperlist = pickle.load(file)
-
+with open("notes.txt", "rb") as file:
+    notesuperlist = pickle.load(file)
 
 def check_if_registered(user_id): # Если пользователя нет, возвращает False, если есть - возвращает группу
+    user_id = int(user_id)
     global groupsuperlist
     for i in groupsuperlist:
         if int(i[0]) == int(user_id):
@@ -37,10 +39,51 @@ def print_schedule(group): # Печатает расписание для гру
     for i in schedulesuperlist:
         if group == i[0]:
             return i
-            break
         else:
             pass
     return False
+
+def check_notes(user_id): # Если пользователь зарегистрирован, но у него нет заметок, создаёт пустой список. Если есть, возвращает True.
+    global notesuperlist
+    user_id = int(user_id)
+    mp = 0
+    if check_if_registered(user_id) is not False:
+        epd = False
+        for i in notesuperlist:
+            if i[0] == user_id:
+                print("abc")
+                mp = 3
+            else:
+                pass
+        if mp == 3:
+            return True
+        else:
+            print("ABC")
+            adsp = [user_id]
+            notesuperlist.append(adsp)
+            with open("notes.txt", "wb") as file:
+                pickle.dump(notesuperlist, file)
+            return 1
+    else:
+        return False
+    
+def print_notes(user_id): # Если записок нет, то выводит False, если есть - выдаёт список для печати.
+    global notesuperlist
+    user_id = int(user_id)
+    outlist = []
+    for i in notesuperlist:
+        if i[0] == user_id:
+            if len(i) < 2:
+                return False
+            else:
+                for u in range(len(i)):
+                    if u != 0:
+                        outlist.append(i[u])
+                    else:
+                        pass
+                return outlist
+        else:
+            pass
 
 # Объект бота
 bot = Bot(token="6340336033:AAG-qE0lUnMKQRzYC_cOcrjsRK9arFhG2UI")
@@ -132,6 +175,27 @@ async def mainfunc(message: Message):
         else:
             pass
         ps3 = False
+    elif message.text == "test":
+        if check_if_registered(message.from_user.id) is not False:
+            if check_notes(message.from_user.id) == 1 and check_notes(message.from_user.id) is not True:
+                await message.answer("У вас пока не было созданных заметок. Теперь вы можете их создавать!")
+            elif check_notes(message.from_user.id) is True:
+                if print_notes(message.from_user.id) is not False:
+                    psv = print_notes(message.from_user.id)
+                    print(psv)
+                    outline = ""
+                    for i in range(0, len(psv)):
+                        if i % 2 == 0:
+                            outline += psv[i]
+                        else:
+                            outline += '\nДата создания заметки: '
+                            outline += psv[i]
+                            await message.answer(outline)
+                            outline = ''
+                else:
+                    await message.answer("У вас нет заметок.")
+            elif check_notes(message.from_user.id) is False:
+                await message.answer("Зарегистрируйтесь, пожалуйста.")
     else:
         pass
 
