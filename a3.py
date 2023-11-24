@@ -5,8 +5,8 @@ abcd = """Нечётная неделя:
 9:40-11:10 - Алгебра, аудитория 0002"""
 import pickle
 
-with open("groups.txt", "rb") as file:
+with open("groups.b", "rb") as file:
     schedulesuperlist = pickle.load(file)
 schedulesuperlist.append(['1111-11', abcd])
-with open("groups.txt", "wb") as file1:
+with open("groups.b", "wb") as file1:
     pickle.dump(schedulesuperlist, file1)

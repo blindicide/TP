@@ -10,25 +10,26 @@ from aiogram.enums import ParseMode
 import pickle
 import subprocess
 
-ps2 = False
-ps3 = False
-ps4 = False
-ps5 = False
-ps6 = False
-pv1 = ''
+temp_changegroup = False
+temp_register = False
+temp_notecommand = False
+temp_addnote = False
+temp_deletenote = False
+temp_groupnumber = ''
+## Переменные для переключения между "режимами"
 
 
-def gettime():
+def gettime(): # Получает текущее время
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     time = dt_string.split(' ')[1]
     return dt_string
 
-with open("users.txt", "rb") as file:
+with open("users.b", "rb") as file:
     groupsuperlist = pickle.load(file)
-with open("groups.txt", "rb") as file:
+with open("groups.b", "rb") as file:
     schedulesuperlist = pickle.load(file)
-with open("notes.txt", "rb") as file:
+with open("notes.b", "rb") as file:
     notesuperlist = pickle.load(file)
 
 def check_if_registered(user_id): # Если пользователя нет, возвращает False, если есть - возвращает группу
@@ -67,7 +68,7 @@ def check_notes(user_id): # Если пользователь зарегистр
         else:
             adsp = [user_id]
             notesuperlist.append(adsp)
-            with open("notes.txt", "wb") as file:
+            with open("notes.b", "wb") as file:
                 pickle.dump(notesuperlist, file)
             return 1
     else:
@@ -99,7 +100,7 @@ dp = Dispatcher()
 @dp.message(F.text)
 async def mainfunc(message: Message):
     global schedulesuperlist, groupsuperlist, nptesuperlist
-    global ps2, ps3, ps4, ps5, ps6, pv1
+    global temp_changegroup, temp_register, temp_notecommand, temp_addnote, temp_deletenote, temp_groupnumber
     if message.text == '/start':
         dt_string = gettime()
         data = dt_string.split(' ')[0]
@@ -111,71 +112,72 @@ async def mainfunc(message: Message):
         else:
             var_time = "Добрый вечер,"
         username = message.from_user.username
-        varres = var_time + " " + username + "." + " Текущие дата и время -" + dt_string + ".\n"
+        start_text = var_time + " " + username + "." + " Текущие дата и время -" + dt_string + ".\n"
         start_var1 = check_if_registered(message.from_user.id)
         if start_var1 is False:
-            varres += "Вы не зарегистрированы в боте. Введите номер группы, расписание которой хотите узнать."
-            await message.answer(varres)
+            start_text += "Вы не зарегистрированы в боте. Введите номер группы, расписание которой хотите узнать."
+            await message.answer(start_text)
         else:
             if print_schedule(start_var1) is not False:
-                varres += "Ваша группа - "
-                varres += str(print_schedule(start_var1)[0])
-                varres += ". Вывожу расписание."
-                await message.answer(varres)
+                start_text += "Ваша группа - "
+                start_text += str(print_schedule(start_var1)[0])
+                start_text += ". Вывожу расписание."
+                await message.answer(start_text)
                 await message.answer(print_schedule(start_var1)[1])
             else:
-                varres += "Ваша группа - "
-                varres += str(start_var1)
-                varres += str(".")
-                await message.answer(varres)
+                start_text += "Ваша группа - "
+                start_text += str(start_var1)
+                start_text += str(".")
+                await message.answer(start_text)
                 await message.answer("Ошибка. Код А-1: несуществующая группа. Пожалуйста, повторите ввод или введите другую группу для регистрации. Для вашего удобства выводим список всех групп по курсам.")
         a = 1
     elif message.text == "chkid":
         await message.answer(str(message.from_user.id))
         a = 1
     elif "-" in message.text:
-        rpd = print_schedule(message.text)
-        if rpd is False:
+        checkgroup1 = print_schedule(message.text)
+        if checkgroup1 is False:
             await message.answer("Ошибка. Код А-1: несуществующая группа. Пожалуйста, повторите ввод или введите другую группу для регистрации. Для вашего удобства выводим список всех групп по курсам.")
         else:
             await message.answer(print_schedule(message.text)[1])
             start_var1 = check_if_registered(message.from_user.id)
             if start_var1 is not False:
-                await message.answer('Хотите изменить свою группу? Напишите "Да", если это нужно.')
-                ps2 = True
-                pv1 = message.text
+                await message.answer('Хотите изменить свою группу? Напишите "Да", если это нужно. Если вы напишете другое сообщение, регистрация будет сброшена.')
+                temp_changegroup = True
+                temp_groupnumber = message.text
             else:
-                ps3 = True
-                print('d')
-                pv1 = message.text
-                await message.answer('Вы не зарегистрированы. Если вы хотите зарегистрироваться (и сделать эту группу своей основной), напишите "Да".')
+                temp_register = True
+                temp_groupnumber = message.text
+                await message.answer(
+                    """Если вы зарегистрируетесь в боте, то ваша группа будет сохранена в нашей базе данных (вы можете поменять её в любой момент).
+                    Вы также сможете создавать заметки прямо в боте. Нажмите кнопку или введите сообщение «Да», чтобы зарегистрироваться."""
+                )
         a = 1
-    elif ps2 is True:
+    elif temp_changegroup is True:
         if message.text == "Да":
             for i in groupsuperlist:
                 if message.from_user.id == i[0]:
-                    i[1] = pv1
-                    msgs = "Вы успешно зарегистрировались, введя группу " + pv1 + ". Если вы хотите её изменить, введите номер желаемой группы."
+                    i[1] = temp_groupnumber
+                    msgs = "Вы успешно зарегистрировались, введя группу " + temp_groupnumber + ". Если вы хотите её изменить, введите номер желаемой группы."
                     pass
         else:
-            await message.answer("Ошибка. Код А-4: неправильный формат ввода. Пожалуйста, проверьте, в каком режиме вы находитесь.")
             pass
-        ps2 = False
-    elif ps3 is True:
+        temp_changegroup = False
+    elif temp_register is True:
         if message.text == "Да":
-            newlst = []
-            newlst.append(message.from_user.id)
-            newlst.append(pv1)
-            groupsuperlist.append(newlst)
+            newlist = []
+            newlist.append(message.from_user.id)
+            newlist.append(temp_groupnumber)
+            groupsuperlist.append(newlist)
             print(groupsuperlist)
-            await message.answer(pv1)
-            with open("users.txt", "wb") as file1:
+            await message.answer(temp_groupnumber)
+            with open("users.b", "wb") as file1:
                 pickle.dump(groupsuperlist, file1)
-            msgs = "Вы успешно зарегистрировались, введя группу " + pv1 + ". Если вы хотите её изменить, введите номер желаемой группы."
+            msgs = "Вы успешно зарегистрировались, введя группу " + temp_groupnumber + ". Если вы хотите её изменить, введите номер желаемой группы."
             await message.answer(msgs)
         else:
             pass
-        ps3 = False
+        temp_register = False
     elif message.text == "/notes":
         if check_if_registered(message.from_user.id) is not False:
             await message.answer(
@@ -184,23 +186,23 @@ async def mainfunc(message: Message):
 2 - Добавить новую заметку
 3 - Удалить все заметки"""
                                  )
-            ps4 = True
+            temp_notecommand = True
         elif check_notes(message.from_user.id) is False:
             await message.answer("Зарегистрируйтесь, пожалуйста.")
-    elif ps4 is True:
+    elif temp_notecommand is True:
         if message.text == "1":
             if check_notes(message.from_user.id) == 1 and check_notes(message.from_user.id) is not True:
                 await message.answer("У вас пока не было созданных заметок. Теперь вы можете их создавать!")
             elif check_notes(message.from_user.id) is True:
                 if print_notes(message.from_user.id) is not False:
-                    psv = print_notes(message.from_user.id)
+                    notelist = print_notes(message.from_user.id)
                     outline = ""
-                    for i in range(0, len(psv)):
+                    for i in range(0, len(notelist)):
                         if i % 2 == 0:
-                            outline += psv[i]
+                            outline += notelist[i]
                         else:
                             outline += '\nДата создания заметки: '
-                            outline += psv[i]
+                            outline += notelist[i]
                             await message.answer(outline)
                             outline = ''
                 else:
@@ -208,28 +210,27 @@ async def mainfunc(message: Message):
             await message.answer("Вызовите команду /notes ещё раз для дополнительных действий с заметками.")
         elif message.text == "2":
             await message.answer("Пожалуйста, напечатайте свою заметку следующим сообщением.\nПримечание: заметки исключительно из чисел в настоящий момент не поддерживаются.")
-            ps5 = True
+            temp_addnote = True
         elif message.text == "3":
             await message.answer("Вы уверены? Если да, напишите 'УДАЛИТЬ' (без кавычек) следующим сообщением.")
-            ps6 = True
+            temp_deletenote = True
         else:
             await message.answer("Ошибка: команда не распознана. Вызовите /notes ещё раз.")
-        ps4 = False
-    elif ps5 is True:
-        temp1 = gettime()
-        evg = message.text
+        temp_notecommand = False
+    elif temp_addnote is True:
+        newnote_text = message.text
         for i in notesuperlist:
             if message.from_user.id == i[0]:
-                i.append(evg)
+                i.append(newnote_text)
                 i.append(gettime())
             else:
                 pass
-        with open("notes.txt", "wb") as file1:
+        with open("notes.b", "wb") as file1:
             pickle.dump(notesuperlist, file1)
-        ps5 = False
+        temp_addnote = False
         outtxt = "Заметка добавлена. Время: " + gettime()
         await message.answer(outtxt)
-    elif ps6 is True and message.text == "УДАЛИТЬ":
+    elif temp_deletenote is True and message.text == "УДАЛИТЬ":
         for i in notesuperlist:
             if message.from_user.id == i[0]:
                 i.clear()
@@ -237,11 +238,23 @@ async def mainfunc(message: Message):
                 await message.answer("Заметки успешно удалены.")
             else:
                 pass
-        with open("notes.txt", "wb") as file1:
+        with open("notes.b", "wb") as file1:
             pickle.dump(notesuperlist, file1)
-        ps6 = False
+        temp_deletenote = False
+    elif message.text == "/help":
+        help_message = """Информационное сообщение
+            Команды:
+            /start - вывести стартовое сообщение
+            (номер группы) - вывести расписание группы
+            /notes - вывести меню заметок (если вы зарегистрированы)
+            /help - вывести это сообщение
+            Текущее время: """
+        help_message += gettime()
+        help_message += """Бот разработан Якуниным Р. и Филатовым А. в 2023 г. в рамках проекта по предмету 'Технологии программирования'
+        По всем вопросам обращайтесь на почту y1rs.yrs@gmail.com с пометкой 'БОТ'."""
+        await message.answer(help_message)
     else:
-        pass
+        await message.answer("Ошибка. Код А-4: неправильный формат ввода. Пожалуйста, проверьте, в каком режиме вы находитесь. Вызовите /help или /start.")
 
 
 
