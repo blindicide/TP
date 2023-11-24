@@ -59,14 +59,12 @@ def check_notes(user_id): # Если пользователь зарегистр
         epd = False
         for i in notesuperlist:
             if i[0] == user_id:
-                print("abc")
                 mp = 3
             else:
                 pass
         if mp == 3:
             return True
         else:
-            print("ABC")
             adsp = [user_id]
             notesuperlist.append(adsp)
             with open("notes.txt", "wb") as file:
@@ -75,7 +73,7 @@ def check_notes(user_id): # Если пользователь зарегистр
     else:
         return False
     
-def print_notes(user_id): # Если записок нет, то выводит False, если есть - выдаёт список для печати.
+def print_notes(user_id): # Если заметок нет, то выводит False, если есть - выдаёт список для печати.
     global notesuperlist
     user_id = int(user_id)
     outlist = []
@@ -165,7 +163,6 @@ async def mainfunc(message: Message):
         ps2 = False
     elif ps3 is True:
         if message.text == "Да":
-            print('vb')
             newlst = []
             newlst.append(message.from_user.id)
             newlst.append(pv1)
@@ -197,7 +194,6 @@ async def mainfunc(message: Message):
             elif check_notes(message.from_user.id) is True:
                 if print_notes(message.from_user.id) is not False:
                     psv = print_notes(message.from_user.id)
-                    print(psv)
                     outline = ""
                     for i in range(0, len(psv)):
                         if i % 2 == 0:
@@ -207,8 +203,8 @@ async def mainfunc(message: Message):
                             outline += psv[i]
                             await message.answer(outline)
                             outline = ''
-            else:
-                await message.answer("У вас нет заметок.")
+                else:
+                    await message.answer("У вас нет заметок.")
             await message.answer("Вызовите команду /notes ещё раз для дополнительных действий с заметками.")
         elif message.text == "2":
             await message.answer("Пожалуйста, напечатайте свою заметку следующим сообщением.")
@@ -231,18 +227,18 @@ async def mainfunc(message: Message):
         with open("notes.txt", "wb") as file1:
             pickle.dump(notesuperlist, file1)
         ps5 = False
-        outtxt = "Заметка добавлена. Время:" + gettime()
+        outtxt = "Заметка добавлена. Время: " + gettime()
         await message.answer(outtxt)
     elif ps6 is True and message.text == "УДАЛИТЬ":
         for i in notesuperlist:
             if message.from_user.id == i[0]:
-                for u in range(len(i)):
-                    if u != 0:
-                        i.pop(u)
-                    else:
-                        pass
+                i.clear()
+                i.append(message.from_user.id)
+                await message.answer("Заметки успешно удалены.")
             else:
                 pass
+        with open("notes.txt", "wb") as file1:
+            pickle.dump(notesuperlist, file1)
         ps6 = False
     else:
         pass
