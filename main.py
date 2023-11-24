@@ -153,7 +153,7 @@ async def mainfunc(message: Message):
                     Вы также сможете создавать заметки прямо в боте. Нажмите кнопку или введите сообщение «Да», чтобы зарегистрироваться."""
                 )
         a = 1
-    elif temp_changegroup is True:
+    elif temp_changegroup is True: # Пользователь меняет группу
         if message.text == "Да":
             for i in groupsuperlist:
                 if message.from_user.id == i[0]:
@@ -163,7 +163,7 @@ async def mainfunc(message: Message):
         else:
             pass
         temp_changegroup = False
-    elif temp_register is True:
+    elif temp_register is True: # Выдача, если пользователь решил зарегистрироваться
         if message.text == "Да":
             newlist = []
             newlist.append(message.from_user.id)
@@ -171,8 +171,8 @@ async def mainfunc(message: Message):
             groupsuperlist.append(newlist)
             print(groupsuperlist)
             await message.answer(temp_groupnumber)
-            with open("users.b", "wb") as file1:
-                pickle.dump(groupsuperlist, file1)
+            with open("users.b", "wb") as file1: # Выгрузка обратно в файл
+                pickle.dump(groupsuperlist, file1) 
             msgs = "Вы успешно зарегистрировались, введя группу " + temp_groupnumber + ". Если вы хотите её изменить, введите номер желаемой группы."
             await message.answer(msgs)
         else:
@@ -225,7 +225,7 @@ async def mainfunc(message: Message):
                 i.append(gettime())
             else:
                 pass
-        with open("notes.b", "wb") as file1:
+        with open("notes.b", "wb") as file1: # Выгрузка обратно в файл
             pickle.dump(notesuperlist, file1)
         temp_addnote = False
         outtxt = "Заметка добавлена. Время: " + gettime()
